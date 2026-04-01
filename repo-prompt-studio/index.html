@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pro Image Prompt Studio — NG Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0F0D08;--surface:#181510;--surface2:#201D14;--surface3:#28241A;
+  --gold:#C9A84C;--gold-light:#E2C97E;--gold-dim:rgba(201,168,76,0.12);
+  --text:#F0EDE8;--muted:#888070;--border:rgba(201,168,76,0.15);
+  --green:#22C55E;--green-dim:rgba(34,197,94,0.12);
+  --red:#EF4444;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;max-width:680px;margin:0 auto;padding:0 0 60px}
+
+.page-header{text-align:center;padding:40px 20px 32px;border-bottom:1px solid var(--border)}
+.agency-label{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,6vw,52px);font-weight:400;line-height:1.1;margin-bottom:4px}
+.page-title em{color:var(--gold);font-style:italic}
+.title-line{width:50px;height:1px;background:var(--gold);margin:14px auto}
+.page-desc{font-size:14px;color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto}
+
+/* API Key box */
+
+
+.form-block{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;margin:16px 20px 0}
+.block-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.field{margin-bottom:16px}
+.field-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:7px}
+.field-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.2s}
+.field-input:focus{border-color:rgba(201,168,76,0.45)}
+.field-input::placeholder{color:var(--muted)}
+.field-select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'Inter',sans-serif;outline:none;cursor:pointer;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%23C9A84C' d='M5 6L0 0h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.field-select option{background:#1A1810}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:480px){.two-col{grid-template-columns:1fr}}
+
+.pill-row{display:flex;gap:8px;flex-wrap:wrap}
+.pill{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.2s;font-family:'Inter',sans-serif}
+.pill.active{background:var(--gold);color:#000;border-color:var(--gold)}
+
+.grid-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+@media(max-width:480px){.grid-btns{grid-template-columns:repeat(2,1fr)}}
+.grid-btn{padding:9px 8px;border-radius:10px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all 0.2s;text-align:center;font-family:'Inter',sans-serif}
+.grid-btn.active{background:var(--gold-dim);border-color:rgba(201,168,76,0.5);color:var(--gold)}
+
+.generate-btn{display:block;width:calc(100% - 40px);margin:20px 20px 0;background:var(--gold);color:#000;border:none;padding:17px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:1.5px;text-transform:uppercase;transition:all 0.3s}
+.generate-btn:hover:not(:disabled){background:var(--gold-light)}
+.generate-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+.results-section{margin:16px 20px 0;display:none}
+.results-section.visible{display:block}
+.result-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:14px}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.result-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:600}
+.result-badge{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;color:var(--muted)}
+.result-text{font-size:14px;line-height:1.8;color:var(--text);background:var(--surface2);border-radius:10px;padding:16px;border-left:2px solid var(--gold);margin-bottom:14px}
+.result-actions{display:flex;gap:8px;flex-wrap:wrap}
+.copy-btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--gold);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.copy-btn:hover{background:var(--gold-dim)}
+.regen-btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;font-family:'Inter',sans-serif;transition:all 0.2s}
+.regen-btn:hover{color:var(--text)}
+.pro-tips{background:var(--gold-dim);border:1px solid rgba(201,168,76,0.2);border-radius:10px;padding:14px 16px;margin-top:14px}
+.pro-tips-label{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:6px}
+.pro-tips-text{font-size:12px;color:var(--muted);line-height:1.6}
+
+.loading{text-align:center;padding:40px 20px;display:none}
+.loading.visible{display:block}
+.loading-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-style:italic;color:var(--muted);margin-bottom:16px}
+.dots{display:flex;justify-content:center;gap:10px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--gold);animation:dp 1.4s ease-in-out infinite}
+.dot:nth-child(2){animation-delay:0.2s}
+.dot:nth-child(3){animation-delay:0.4s}
+@keyframes dp{0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)}}
+
+.error-box{background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:10px;padding:14px;margin:14px 20px 0;font-size:13px;color:#FCA5A5;display:none}
+.error-box.visible{display:block}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="agency-label">NG Intelligence Agency</div>
+  <h1 class="page-title">Pro Image <em>Prompt Studio</em></h1>
+  <div class="title-line"></div>
+  <p class="page-desc">Generate professional lifestyle photography prompts for AI image tools. Professional lighting, composition and styling built in.</p>
+</div>
+
+
+
+<!-- SUBJECT -->
+<div class="form-block">
+  <div class="block-label">Subject</div>
+  <div class="field">
+    <div class="pill-row">
+      <button class="pill active" onclick="setVal('subject',this,'Woman')">Woman</button>
+      <button class="pill" onclick="setVal('subject',this,'Man')">Man</button>
+      <button class="pill" onclick="setVal('subject',this,'Couple')">Couple</button>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="field">
+      <div class="field-label">Age Range</div>
+      <select class="field-select" id="ageRange">
+        <option>20s</option><option>30s</option><option selected>40s</option><option>50s</option><option>60s</option>
+      </select>
+    </div>
+    <div class="field">
+      <div class="field-label">Ethnicity / Look</div>
+      <select class="field-select" id="ethnicity">
+        <option>Mixed</option><option>Caucasian</option><option>Black / African</option><option>Asian</option><option>Hispanic / Latina</option><option>Middle Eastern</option>
+      </select>
+    </div>
+  </div>
+  <div class="field" style="margin-bottom:0">
+    <div class="field-label">Custom Details (Optional)</div>
+    <input class="field-input" id="customFeatures" type="text" placeholder="e.g. long dark hair, tattoos, glasses, beard..."/>
+  </div>
+</div>
+
+<!-- SCENE -->
+<div class="form-block">
+  <div class="block-label">Scene & Location</div>
+  <div class="grid-btns" id="sceneGrid">
+    <button class="grid-btn active" onclick="setGrid('sceneGrid',this,'Luxury Home')">Luxury Home</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Bathroom / Spa')">Bathroom / Spa</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Kitchen')">Kitchen</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Bedroom')">Bedroom</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Outdoor / Nature')">Outdoor / Nature</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Urban / Street')">Urban / Street</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Cafe / Restaurant')">Cafe / Restaurant</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Gym / Fitness')">Gym / Fitness</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Wellness / Yoga')">Wellness / Yoga</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Office / Workspace')">Office / Workspace</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Podcast Studio')">Podcast Studio</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Photo Studio')">Photo Studio</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Rooftop / Penthouse')">Rooftop / Penthouse</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Beach / Pool')">Beach / Pool</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Luxury Car')">Luxury Car</button>
+    <button class="grid-btn" onclick="setGrid('sceneGrid',this,'Travel / Airport')">Travel / Airport</button>
+  </div>
+</div>
+
+<!-- MOOD -->
+<div class="form-block">
+  <div class="block-label">Mood & Vibe</div>
+  <div class="grid-btns" id="moodGrid">
+    <button class="grid-btn active" onclick="setGrid('moodGrid',this,'Confident & Powerful')">Confident & Powerful</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Soft & Intimate')">Soft & Intimate</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Editorial / High Fashion')">Editorial / High Fashion</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Warm & Natural')">Warm & Natural</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Dark & Moody')">Dark & Moody</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Bright & Airy')">Bright & Airy</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Professional')">Professional</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Playful & Candid')">Playful & Candid</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Cinematic & Dramatic')">Cinematic & Dramatic</button>
+    <button class="grid-btn" onclick="setGrid('moodGrid',this,'Luxury & Aspirational')">Luxury & Aspirational</button>
+  </div>
+</div>
+
+<!-- OUTFIT & LIGHTING -->
+<div class="form-block">
+  <div class="two-col">
+    <div class="field" style="margin:0">
+      <div class="field-label">Outfit / Clothing</div>
+      <select class="field-select" id="outfit">
+        <option>Athleticwear / Gym Wear</option><option>Casual Chic</option>
+        <option>Business / Smart</option><option>Evening / Glamour</option>
+        <option>Swimwear / Resort</option><option>Streetwear</option>
+        <option>Luxury / Designer</option><option>Casual / Everyday</option>
+      </select>
+    </div>
+    <div class="field" style="margin:0">
+      <div class="field-label">Lighting</div>
+      <select class="field-select" id="lighting">
+        <option>Soft Natural Daylight</option><option>Golden Hour</option>
+        <option>Studio Softbox</option><option>Cinematic Side Light</option>
+        <option>Candlelight / Warm Glow</option><option>High Key White</option>
+        <option>Dramatic Low Key</option><option>Blue Hour / Dusk</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- PLATFORM -->
+<div class="form-block">
+  <div class="block-label">Output Platform</div>
+  <div class="grid-btns" id="platformGrid">
+    <button class="grid-btn" onclick="setGrid('platformGrid',this,'Midjourney')">Midjourney</button>
+    <button class="grid-btn active" onclick="setGrid('platformGrid',this,'DALL-E')">DALL-E</button>
+    <button class="grid-btn" onclick="setGrid('platformGrid',this,'Flux')">Flux</button>
+    <button class="grid-btn" onclick="setGrid('platformGrid',this,'Ideogram')">Ideogram</button>
+    <button class="grid-btn" onclick="setGrid('platformGrid',this,'Adobe Firefly')">Adobe Firefly</button>
+    <button class="grid-btn" onclick="setGrid('platformGrid',this,'Leonardo AI')">Leonardo AI</button>
+  </div>
+</div>
+
+<div class="error-box" id="errorBox"></div>
+
+<button class="generate-btn" id="generateBtn" onclick="generatePrompt()">✦ Generate Professional Prompt</button>
+
+<div class="loading" id="loading">
+  <div class="loading-title">Crafting your prompt...</div>
+  <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+</div>
+
+<div class="results-section" id="results">
+  <div class="result-card">
+    <div class="result-header">
+      <div class="result-label">Your Prompt</div>
+      <div class="result-badge" id="badge1">DALL-E</div>
+    </div>
+    <div class="result-text" id="promptText"></div>
+    <div class="result-actions">
+      <button class="copy-btn" onclick="copyText('promptText',this)">📋 Copy Prompt</button>
+      <button class="regen-btn" onclick="generatePrompt()">↺ Regenerate</button>
+    </div>
+    <div class="pro-tips">
+      <div class="pro-tips-label">Pro Tips</div>
+      <div class="pro-tips-text" id="proTips"></div>
+    </div>
+  </div>
+  <div class="result-card">
+    <div class="result-header">
+      <div class="result-label">Variation</div>
+      <div class="result-badge" id="badge2">DALL-E</div>
+    </div>
+    <div class="result-text" id="variationText"></div>
+    <div class="result-actions">
+      <button class="copy-btn" onclick="copyText('variationText',this)">📋 Copy Variation</button>
+    </div>
+  </div>
+  <button class="generate-btn" style="margin-bottom:0" onclick="generatePrompt()">✦ Generate New Prompt</button>
+</div>
+
+<script>
+// State
+let vals = { subject:'Woman', scene:'Luxury Home', mood:'Confident & Powerful', platform:'DALL-E' };
+
+function setVal(type, el, val) {
+  el.closest('.field, .form-block').querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  vals[type] = val;
+}
+
+function setGrid(gridId, el, val) {
+  document.getElementById(gridId).querySelectorAll('.grid-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  const map = { sceneGrid:'scene', moodGrid:'mood', platformGrid:'platform' };
+  vals[map[gridId]] = val;
+}
+
+async function generatePrompt() {
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('loading').classList.add('visible');
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('errorBox').classList.remove('visible');
+
+  try {
+    const res = await fetch('/.netlify/functions/prompt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject: vals.subject,
+        ageRange: document.getElementById('ageRange').value,
+        ethnicity: document.getElementById('ethnicity').value,
+        customFeatures: document.getElementById('customFeatures').value,
+        scene: vals.scene,
+        mood: vals.mood,
+        outfit: document.getElementById('outfit').value,
+        lighting: document.getElementById('lighting').value,
+        platform: vals.platform
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Generation failed');
+
+    document.getElementById('promptText').textContent = data.prompt;
+    document.getElementById('variationText').textContent = data.variation;
+    document.getElementById('badge1').textContent = vals.platform;
+    document.getElementById('badge2').textContent = vals.platform;
+
+    const tips = {
+      'Midjourney': 'Add --ar 9:16 --style raw --v 6 at the end for best results.',
+      'DALL-E': 'Paste directly into ChatGPT or DALL-E. Upload a reference photo for best results.',
+      'Flux': 'Use in Flux Dev or Pro via Replicate or fal.ai.',
+      'Ideogram': 'Set style to Realistic and aspect ratio to 9:16.',
+      'Adobe Firefly': 'Optimised for Adobe safety filters. Use in Photoshop Generative Fill.',
+      'Leonardo AI': 'Use Realistic Vision model. Set to Portrait 9:16 format.',
+    };
+    document.getElementById('proTips').textContent = tips[vals.platform] || 'Paste directly into your chosen AI tool.';
+    document.getElementById('results').classList.add('visible');
+    document.getElementById('results').scrollIntoView({ behavior:'smooth' });
+
+  } catch(err) {
+    showError('Error: ' + err.message);
+  } finally {
+    document.getElementById('loading').classList.remove('visible');
+    document.getElementById('generateBtn').disabled = false;
+  }
+}
+
+function copyText(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function showError(msg) {
+  const b = document.getElementById('errorBox');
+  b.textContent = '⚠ ' + msg;
+  b.classList.add('visible');
+}
+</script>
+</body>
+</html>
